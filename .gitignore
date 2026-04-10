@@ -1,1 +1,3 @@
 .git/
+/.config/qtile/themes/__pycache__
+/.config/qtile/__pycache__
