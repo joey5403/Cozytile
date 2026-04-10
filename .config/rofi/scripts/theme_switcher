@@ -1,70 +1,26 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# theme_switcher - Interactive theme switcher for Qtile
 
-# ───────────────────────────────────────────────────────────────
-#                      Theme Settings
-# ───────────────────────────────────────────────────────────────
-dir="$HOME/.config/rofi/settings/theme_switcher/"
+THEMES_DIR="$HOME/.config/qtile/themes"
+CONFIG_FILE="$HOME/.config/qtile/.current_theme"
 
-# ───────────────────────────────────────────────────────────────
-#                         Menu Options
-# ───────────────────────────────────────────────────────────────
-theme1='Cozy'
-theme2='Sakura'
-theme3='Natura'
-theme4='Everforest'
-theme5='Carbon'
+# Get list of available themes
+mapfile -t THEMES < <(ls "$THEMES_DIR"/*.py 2>/dev/null | xargs -n1 basename | sed 's/\.py$//' | grep -v __init__)
 
-# ───────────────────────────────────────────────────────────────
-#                           User Info
-# ───────────────────────────────────────────────────────────────
-username=" $(whoami)"
-messages=("Which theme do you want?" "Select a theme to apply!" "Choose your preferred theme!")
+if [ ${#THEMES[@]} -eq 0 ]; then
+    echo "No themes found in $THEMES_DIR"
+    exit 1
+fi
 
-# Pick a random message
-sendoff="${messages[$((RANDOM % ${#messages[@]}))]}"
+# Use rofi to select theme
+SELECTED=$(printf '%s\n' "${THEMES[@]}" | rofi -dmenu -p "Select Theme" -theme ~/.config/rofi/config.rasi)
 
-# ───────────────────────────────────────────────────────────────
-#                           Rofi Cmd
-# ───────────────────────────────────────────────────────────────
-rofi_cmd() {
-    rofi -dmenu \
-        -p "$username" \
-        -mesg "$sendoff" \
-        -theme ${dir}/cozy.rasi
-}
+if [ -z "$SELECTED" ]; then
+    exit 0
+fi
 
-# ───────────────────────────────────────────────────────────────
-#                       Run Rofi Menu
-# ───────────────────────────────────────────────────────────────
-run_rofi() {
-    echo -e "$theme1\n$theme2\n$theme3\n$theme4\n$theme5" | rofi_cmd
-}
+# Write current theme
+echo "$SELECTED" > "$CONFIG_FILE"
 
-# ───────────────────────────────────────────────────────────────
-#                        Command Exec
-# ───────────────────────────────────────────────────────────────
-run_cmd() {
-    case $1 in
-        "$theme1")
-            ~/.config/rofi/theme_scripts/Cozy
-            ;;
-        "$theme2")
-            ~/.config/rofi/theme_scripts/Sakura
-            ;;
-        "$theme3")
-            ~/.config/rofi/theme_scripts/Natura
-            ;;
-        "$theme4")
-            ~/.config/rofi/theme_scripts/Everforest
-            ;;
-        "$theme5")
-            ~/.config/rofi/theme_scripts/Carbon
-            ;;
-    esac
-}
-
-# ───────────────────────────────────────────────────────────────
-#                           Execute Cmd
-# ───────────────────────────────────────────────────────────────
-chosen="$(run_rofi)"
-run_cmd "$chosen"
+# Restart Qtile to apply
+qtile cmd-obj -o cmd -f restart
