@@ -3,6 +3,7 @@
 
 THEMES_DIR="$HOME/.config/qtile/themes"
 CONFIG_FILE="$HOME/.config/qtile/.current_theme"
+THEME_SCRIPTS_DIR="$HOME/.config/rofi/theme_scripts"
 
 # Get list of available themes
 mapfile -t THEMES < <(ls "$THEMES_DIR"/*.py 2>/dev/null | xargs -n1 basename | sed 's/\.py$//' | grep -v __init__)
@@ -22,5 +23,10 @@ fi
 # Write current theme
 echo "$SELECTED" > "$CONFIG_FILE"
 
-# Restart Qtile to apply
-qtile cmd-obj -o cmd -f restart
+# Run theme script to apply wallpaper and other changes
+if [ -x "$THEME_SCRIPTS_DIR/$SELECTED" ]; then
+    "$THEME_SCRIPTS_DIR/$SELECTED"
+else
+    # Fallback: just restart qtile
+    qtile cmd-obj -o cmd -f restart
+fi
