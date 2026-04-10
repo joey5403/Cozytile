@@ -1,4 +1,6 @@
 # config.py
+import os
+import subprocess
 from libqtile import bar, hook, layout
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
@@ -80,13 +82,12 @@ floating_layout = layout.Floating(
     ],
 )
 
-import os
-import subprocess
-
 
 @hook.subscribe.startup_once
 def autostart():
-    subprocess.call([os.path.expanduser(".config/qtile/autostart_once.sh")])
+    script = os.path.expanduser(".config/qtile/autostart_once.sh")
+    if os.path.exists(script):
+        subprocess.call([script])
 
 
 auto_fullscreen = True
