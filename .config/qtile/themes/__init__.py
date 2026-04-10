@@ -23,8 +23,15 @@ def get_current_theme():
 
     try:
         theme_module = import_module(f"themes.{theme_name}")
-        return theme_module.COLORS
-    except (ModuleNotFoundError, ImportError, AttributeError):
+    except (ModuleNotFoundError, ImportError):
         # Fallback to default theme
-        default_module = import_module(f"themes.{DEFAULT_THEME}")
-        return default_module.COLORS
+        theme_module = import_module(f"themes.{DEFAULT_THEME}")
+
+    # Return a merged dict so config.py can access theme["colors"], theme["layout"], etc.
+    return {
+        "colors": theme_module.COLORS,
+        "layout": getattr(theme_module, "LAYOUT", {}),
+        "sizes": getattr(theme_module, "SIZES", {}),
+        "font": getattr(theme_module, "FONT", "sans"),
+        "font_bold": getattr(theme_module, "font_bold", "sans"),
+    }
