@@ -1,0 +1,3 @@
+/* Default Rofi Configuration */
+
+@import "settings/launcher/cozy.rasi"
