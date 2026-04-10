@@ -17,7 +17,7 @@ SIZES = {
 }
 
 FONT = "JetBrainsMono Nerd Font"
-FONT_BOLD = "JetBrainsMono Nerd Font Bold"
+font_bold = "JetBrainsMono Nerd Font Bold"
 
 LAYOUT = {
     "border_width": 0,
