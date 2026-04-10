@@ -54,13 +54,10 @@ A cozy rice to keep things comfy. I honestly think Qtile is way too underrated�
 | Component | Choice |
 | :--- | :--- |
 | **Window Manager** | Qtile |
-| **Compositor** | Picom |
 | **Terminal** | Alacritty |
 | **Launcher** | Rofi |
-| **Shell** | Zsh + Starship |
 | **Notifications** | Dunst |
 | **File Manager** | Thunar |
-| **Display Manager**| SDDM (Custom Themes) |
 | **Audio** | MPD + Ncmpcpp + Cava |
 
 </td>
@@ -78,7 +75,7 @@ A cozy rice to keep things comfy. I honestly think Qtile is way too underrated�
 ### 🌿 ᴛʜᴇ ᴀᴜᴛᴏᴍᴀᴛᴇᴅ ᴘᴀᴛʜ (ᴀʀᴄʜ ʟɪɴᴜx)
 
 > [!TIP]
-> **Recommended:** For the purest experience, an automated installation script is provided. It handles AUR helpers, dependencies, custom SDDM themes, font caching, and Zsh configuration automatically.
+> **Recommended:** For the purest experience, an automated installation script is provided. It handles AUR helpers, dependencies, font caching, and shell configuration automatically.
 
 ```sh
 # 1. Fetch the repository
@@ -91,7 +88,7 @@ chmod +x install.sh
 ```
 
 > [!IMPORTANT]
-> Once the script finishes, you'll be greeted by SDDM. **Select `Qtile (Xorg)`** from the top-left corner before logging in. Do not use Qtile Wayland!
+> Once the script finishes, reboot your system to apply the changes.
 
 <br>
 
@@ -113,7 +110,7 @@ cd ~/.srcs/paru && makepkg -si
 **2. Core Dependencies & Fonts:**
 Install the window manager, compositor, terminal, aesthetic tools, and all the required nerd fonts.
 ```sh
-paru -S --needed qtile python-psutil pywal-git qt5-graphicaleffects picom dunst zsh starship mpd ncmpcpp playerctl brightnessctl alacritty pfetch htop flameshot thunar roficlip rofi ranger cava neovim vim feh sddm qt6-5compat qt6-declarative qt6-svg pipewire pipewire-pulse pamixer ttf-jetbrains-mono-nerd ttf-hack-nerd ttf-font-awesome ttf-firacode-nerd ttf-icomoon-feather
+paru -S --needed qtile python-psutil pywal-git qt5-graphicaleffects dunst starship mpd ncmpcpp playerctl brightnessctl alacritty pfetch htop flameshot thunar roficlip rofi ranger cava neovim vim feh qt6-5compat qt6-declarative qt6-svg pipewire pipewire-pulse pamixer ttf-jetbrains-mono-nerd ttf-hack-nerd ttf-font-awesome ttf-firacode-nerd ttf-icomoon-feather
 ```
 
 **3. [OPTIONAL] Adjusting Configurations by Device:**
@@ -144,7 +141,6 @@ cd ~/.srcs/Cozytile
 cp -ra .config/* ~/.config/
 cp -ra Wallpaper ~/
 cp -ra Themes ~/
-cp -a .zshrc ~/
 ```
 
 **5. Update the Font Cache:**
@@ -166,34 +162,7 @@ sudo pacman -S --needed xorg xorg-xinit xf86-video-amdgpu
 sudo pacman -S --needed xorg xorg-xinit nvidia-settings nvidia-utils
 ```
 
-**7. Shell Framework (Zsh + Oh-My-Zsh):**
-Initialize your shell aesthetics and install the required plugins.
-```sh
-chsh -s $(which zsh)
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended 
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
-
-**8. SDDM Display Manager & Custom Themes:**
-Enable SDDM, inject the handcrafted Cozy themes into the system theme directory, and allow your user to change SDDM themes without password authentication.
-```sh
-# Copy themes
-sudo mkdir -p /usr/share/sddm/themes /etc/sddm.conf.d
-sudo cp -r sddm-themes/* /usr/share/sddm/themes/
-
-# Set 'Cozy' as the active theme
-echo -e "[Theme]\nCurrent=Cozy" | sudo tee /etc/sddm.conf.d/theme.conf
-
-# Setup sudoers automation for SDDM changes from UI
-echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/tee /etc/sddm.conf.d/theme.conf" | sudo tee /etc/sudoers.d/cozytile-sddm
-sudo chmod 440 /etc/sudoers.d/cozytile-sddm
-
-# Enable SDDM service
-sudo systemctl enable sddm
-```
-
-**9. Preload Wallpaper Cache:**
+**7. Preload Wallpaper Cache:**
 To ensure system colors are ready to go immediately, generate `pywal` color caches for the included wallpapers.
 ```sh
 wal -b 282738 -i ~/Wallpaper/Aesthetic2.png
@@ -204,7 +173,7 @@ wal -i ~/Wallpaper/a_road_going_through_a_desert.jpeg
 wal --theme ~/.cache/wal/e-ink.json
 ```
 
-**10. Finalize & Reboot:**
+**8. Finalize & Reboot:**
 The most important step! Reboot your system to apply all changes and start your new journey with Cozytile!
 ```sh
 sudo reboot

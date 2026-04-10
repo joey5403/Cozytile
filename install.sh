@@ -209,9 +209,9 @@ if pacman -Qi pywal-git &> /dev/null; then
     $AUR_HELPER -R pywal-git 
 fi
 $AUR_HELPER -S --noconfirm --needed \
-qtile python-psutil python-pywal qt5-graphicaleffects picom dunst zsh starship mpd ncmpcpp \
+qtile python-psutil python-pywal qt5-graphicaleffects dunst starship mpd ncmpcpp \
 playerctl brightnessctl alacritty pfetch htop flameshot thunar \
-roficlip rofi ranger cava neovim vim feh sddm qt6-5compat qt6-declarative qt6-svg pipewire pipewire-pulse \
+roficlip rofi ranger cava neovim vim feh qt6-5compat qt6-declarative qt6-svg pipewire pipewire-pulse \
 pamixer ttf-jetbrains-mono-nerd ttf-hack-nerd ttf-font-awesome ttf-firacode-nerd ttf-icomoon-feather
 dim_off
 success "All dependencies and fonts installed."
@@ -252,7 +252,6 @@ CONFIG_ITEMS=(
     ".config/dunst"
     ".config/alacritty"
     ".config/cava"
-    ".config/picom"
     ".config/qtile"
     ".config/spicetify"
     "Wallpaper"
@@ -275,99 +274,6 @@ dim_on
 fc-cache -fv > /dev/null 2>&1
 dim_off
 success "Fonts loaded into system."
-
-########################################
-# GPU Driver
-########################################
-
-header
-echo -e "${C_MAIN}${C_BOLD} ╭─ 󰪡 Select your GPU Driver${C_RESET}"
-echo -e "${C_MAIN}${C_BOLD} │  ${C_ACCENT}1 ${C_DIM}❯ ${C_RESET}Intel"
-echo -e "${C_MAIN}${C_BOLD} │  ${C_ACCENT}2 ${C_DIM}❯ ${C_RESET}AMD"
-echo -e "${C_MAIN}${C_BOLD} │  ${C_ACCENT}3 ${C_DIM}❯ ${C_RESET}NVIDIA"
-echo -e "${C_MAIN}${C_BOLD} │  ${C_ACCENT}4 ${C_DIM}❯ ${C_RESET}Skip / Virtual Machine"
-echo -ne "${C_MAIN}${C_BOLD} ╰─ ${C_YELLOW}Choice (default 1): ${C_RESET}"
-read -rp "" vid
-echo ""
-
-case "$vid" in
-    2) DRI="xf86-video-amdgpu" ;;
-    3) DRI="nvidia-settings nvidia-utils" ;;
-    4) DRI="" ;;
-    *) DRI="xf86-video-intel" ;;
-esac
-
-info "Installing Xorg and GPU stack..."
-dim_on
-sudo pacman -S --noconfirm --needed xorg xorg-xinit $DRI
-dim_off
-success "Graphics stack installed."
-
-########################################
-# Zsh Setup
-########################################
-
-info "Configuring Zsh framework..."
-dim_on
-
-chsh -s "$(which zsh)"
-rm -rf "$HOME/.oh-my-zsh"
-
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
-${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-dim_off
-
-if [ -f "$HOME/.zshrc" ]; then
-    mv "$HOME/.zshrc" "$BACKUP_DIR/.zshrc"
-    substep "Backed up existing .zshrc"
-fi
-
-if [ -f "$REPO_DIR/.zshrc" ]; then
-    cp "$REPO_DIR/.zshrc" "$HOME/.zshrc"
-    substep "${C_GREEN}Installed:${C_RESET} Custom .zshrc"
-fi
-
-success "Zsh fully configured."
-
-########################################
-# Enable SDDM
-########################################
-
-info "Enabling Display Manager (SDDM)..."
-dim_on
-sudo systemctl enable sddm
-dim_off
-success "SDDM service enabled."
-
-########################################
-# Install SDDM Themes
-########################################
-
-info "Installing refined SDDM themes..."
-dim_on
-sudo mkdir -p /usr/share/sddm/themes
-sudo cp -r "$REPO_DIR"/sddm-themes/* /usr/share/sddm/themes/
-sudo mkdir -p /etc/sddm.conf.d
-echo -e "[Theme]\nCurrent=Cozy" | sudo tee /etc/sddm.conf.d/theme.conf
-dim_off
-success "SDDM themes installed and configured."
-
-########################################
-# Sudoers Automation (SDDM Sync)
-########################################
-
-info "Automating SDDM theme switching..."
-dim_on
-echo "$USER ALL=(ALL) NOPASSWD: /usr/bin/tee /etc/sddm.conf.d/theme.conf" | sudo tee /etc/sudoers.d/cozytile-sddm > /dev/null
-sudo chmod 440 /etc/sudoers.d/cozytile-sddm
-dim_off
-success "Sudoers rule added for SDDM sync."
 
 ########################################
 # Wallpaper Cache
